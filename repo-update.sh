@@ -45,6 +45,7 @@ function update {
   if [ "$prune_remote" = true ] ; then
     git remote update --prune
   fi
+  git gc --prune=now
   git checkout -
   if [[ $editedFiles != *"No local changes to save"* ]]
   then
