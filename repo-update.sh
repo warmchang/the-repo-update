@@ -33,19 +33,31 @@ function update {
   editedFiles=`cat /tmp/repoUpdate`
   printf "\n"
   echo $editedFiles
-  git checkout master
   # git pull --rebase
   git fetch --all
-  hasupstream=`git remote | grep "upstream"`
-  if [ "$hasupstream" = "upstream" ] ; then
-    git rebase upstream/master
-  else
-    git rebase origin/master
+
+  hasmaster=`git branch | grep -w "master"`
+  hasmain=`git branch | grep -w "main"`
+  remote=`git remote | grep -w "upstream"`
+
+  if [ -z "$remote" ] ; then
+    printf "Has not upstream remote.\n"
+    remote="origin"
   fi
+
+  if [ -n "$hasmaster" ] ; then
+    printf "Has master branch.\n"
+    git checkout master
+    git rebase $remote/master
+  elif [ -n "$hasmain" ] ; then
+    printf "Has main branch.\n"
+    git checkout main
+    git rebase $remote/main
+  fi
+
   if [ "$prune_remote" = true ] ; then
     git remote update --prune
   fi
-  git gc --prune=now
   git checkout -
   if [[ $editedFiles != *"No local changes to save"* ]]
   then
